@@ -1,8 +1,10 @@
 import json
-
 import requests
 
+from peewee import *
+
 from repository import Repository
+from DataLine import DataLine
 
 
 class UserCounter:
@@ -15,7 +17,9 @@ class UserCounter:
 
     @staticmethod
     def get_ip_country(ip: str):
+
         response = requests.get(f"https://ipinfo.io/{ip}/json")
+
         content = json.loads(response.content)
 
         try:
