@@ -1,6 +1,7 @@
 from datetime import timedelta
 from flask import Flask, request, jsonify, session
 
+import SQLite_impl
 from smart_repo import SmartRepo
 from user_counter import UserCounter
 
@@ -9,7 +10,7 @@ app.secret_key = 'qwertyyaebusobak'
 
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
-repo = SmartRepo()
+repo = SQLite_impl.SQLiteRepository()
 user_counter = UserCounter(repo)
 
 
@@ -23,7 +24,9 @@ def counter():
             request.user_agent.string
         )
 
-    return "Welcome :D"
+    repo.get_all_users()
+
+    return str(repo.get_all_users())
 
 
 @app.route('/last')

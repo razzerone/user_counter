@@ -1,8 +1,6 @@
 import json
 import requests
 
-from peewee import *
-
 from repository import Repository
 from DataLine import DataLine
 

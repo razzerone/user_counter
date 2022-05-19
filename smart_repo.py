@@ -9,8 +9,8 @@ class SmartRepo(Repository):
         self.repo = DataLine
         '''it did not work yet,but I am trying.....'''
         self.repo.delete().where(self.repo.date.between(
-            datetime.date.today(),
-            datetime.date.today() + datetime.timedelta(seconds=20)))
+            datetime.datetime.now(),
+            datetime.datetime.now()+ datetime.timedelta(seconds=20)))
         self.repo.create_table()
 
     def add_new_user(self, ip: str, page: str, user_agent: str, country: str):
