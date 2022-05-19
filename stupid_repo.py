@@ -16,7 +16,7 @@ class StupidRepo(Repository):
 
         self.count += 1
 
-    def get_users(self):
+    def get_last(self):
         return self.repo
 
     def get_users_count(self):

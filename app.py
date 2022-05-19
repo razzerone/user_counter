@@ -14,16 +14,26 @@ user_counter = UserCounter(repo)
 
 
 @app.route('/')
-def hello_world():
+def counter():
     if 'visited' not in session:
         session['visited'] = True
-
         user_counter.add_visitor(
             request.remote_addr,
             request.path,
             request.user_agent.string
         )
-    return repo.get_users_count()
+
+    return "Welcome :D"
+
+
+@app.route('/last')
+def all_users():
+    return str(repo.get_last())
+
+
+@app.route('/count')
+def count():
+    return str(repo.get_users_count())
 
 
 if __name__ == '__main__':
