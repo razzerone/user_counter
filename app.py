@@ -10,7 +10,7 @@ app.secret_key = 'qwertyyaebusobak'
 
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
-repo = SQLite_impl.SQLiteRepository()
+repo = SQLite_impl.SQLiteRepository('data.db')
 user_counter = UserCounter(repo)
 
 

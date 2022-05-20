@@ -1,8 +1,10 @@
 import json
+import sys
+
 import requests
+from requests import HTTPError
 
 from repository import Repository
-from DataLine import DataLine
 
 
 class UserCounter:
@@ -15,8 +17,13 @@ class UserCounter:
 
     @staticmethod
     def get_ip_country(ip: str):
-
-        response = requests.get(f"https://ipinfo.io/{ip}/json")
+        try:
+            response = requests.get(f"https://ipinfo.io/{ip}/json")
+        except ConnectionError as e:
+            print('Проблемы при соединении с сетью')
+            sys.exit(-1)
+        except HTTPError as e:
+            return '*'
 
         content = json.loads(response.content)
 
