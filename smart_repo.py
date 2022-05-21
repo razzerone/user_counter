@@ -15,7 +15,13 @@ class SmartRepo(Repository):
         a.save()
 
     def get_last(self):
+        return DataLine.select().order_by(DataLine.id.desc()).tuples()[0]
+
+    def get_first(self):
         return DataLine.select().order_by(DataLine.id.desc()).tuples()[-1]
 
     def get_users_count(self):
         return DataLine.select().order_by(DataLine.id.desc()).get()
+
+    def get_all_users(self):
+        return DataLine.select().tuples()
