@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Flask Intro - login page</title>
+    <title>Login page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -12,7 +12,10 @@
         <input type="text" placeholder="Username" name="username">
         <input type="password" placeholder="Password" name="password">
         <input class="btn btn-default" type="submit" value="Login">
-
+        <a href="{{ url_for('signup') }}">Sign up</a>
+        <p>
+            {{message}}
+        </p>
     </form>
 
 </div>

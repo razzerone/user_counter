@@ -1,20 +1,26 @@
-from datetime import timedelta
-from flask import Flask, request, jsonify, session, render_template, Blueprint
-from flask_login import login_required, login_manager, UserMixin, LoginManager
-from peewee import Model, CharField, DateTimeField, SqliteDatabase
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import request, session, render_template
+from flask_login import login_required, UserMixin, login_user
 
-import SQLite_impl
+from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
+from datetime import timedelta
+
+from flask import Flask
+from flask_login import LoginManager
+from peewee import SqliteDatabase
+
+from database.UserRepository_SqlAlchemy import UsersRepo
 from smart_repo import SmartRepo
 from user_counter import UserCounter
 
 app = Flask(__name__)
-app.secret_key = 'qwertyyaebusobak'
+app.secret_key = secrets.token_bytes()
 
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 repo = SmartRepo()
 user_counter = UserCounter(repo)
+user_repo = UsersRepo()
 db = SqliteDatabase('data.db')
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -34,24 +40,38 @@ def counter():
     return render_template("layout.html")
 
 
-@app.route('/login', methods=['post',  'get'])
+@app.route('/login', methods=['post', 'get'])
 def login():
     message = ''
     if request.method == 'POST':
         print(request.form)
-    username = request.form.get('username')
-    password = request.form.get('password')
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-    if username == 'root' and password == 'pass':
-        message = "Correct username and password"
-    else:
-        message = "Wrong username or password"
+        i, login_, password_ = user_repo.get_user_by_login(username)
+
+        if check_password_hash(password_, password):
+            login_user(User(i, username, password))
+            message = 'login succesful'
+        else:
+            message = "login unsuccessful"
 
     return render_template('login.html', message=message)
 
+
 @app.route('/signup')
 def signup():
-    return "aaaa"
+    return render_template('signup.html')
+
+
+@app.route('/validate_reg', methods=['GET', 'POST'])
+def validate():
+    name = request.form.get('name')
+    password = request.form.get('password')
+    if user_repo.get_user_by_login(name) is not None:
+        return render_template('signup.html', message="пользователь существует")
+    user_repo.add_new_user(name, password)
+    return render_template('signup.html', message="пользователь зарегистрирован")
 
 
 @app.route('/last')
@@ -82,26 +102,34 @@ def aaaa():
 
 
 @login_manager.user_loader
-def load_user(user_id):
-    return db.session.query(User).get(user_id)
+class User(UserMixin):
+    def __init__(self, id, login, password, active=True):
+        self.id = id
+        self.password_hash = password
+        self.login = login
+        self.active = active
+
+    def is_active(self):
+        # Here you should write whatever the code is
+        # that checks the database if your user is active
+        return self.active
+
+    def is_anonymous(self):
+        return False
+
+    def is_authenticated(self):
+        return True
+
+    def get_id(self):
+        return (self.id)
 
 
 @login_manager.user_loader
-class User(Model, UserMixin):
-    name = CharField()
-    password_hash = CharField()
-    email = CharField()
-    created_on = DateTimeField()
-    updated_on = DateTimeField()
-
-    class Meta:
-        database = db
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+def load_user(id):
+    # 1. Fetch against the database a user by `id`
+    # 2. Create a new object of `User` class and return it.
+    _, login, hash = user_repo.get_user_by_id(id)
+    return User(id, login, hash)
 
 
 if __name__ == '__main__':
