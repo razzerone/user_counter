@@ -1,5 +1,5 @@
-from flask import request, session, render_template
-from flask_login import login_required, UserMixin, login_user
+from flask import request, session, render_template, redirect, url_for
+from flask_login import login_required, UserMixin, login_user, current_user
 
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
@@ -23,6 +23,7 @@ user_counter = UserCounter(repo)
 user_repo = UsersRepo()
 db = SqliteDatabase('data.db')
 login_manager = LoginManager(app)
+login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
@@ -42,6 +43,8 @@ def counter():
 
 @app.route('/login', methods=['post', 'get'])
 def login():
+    if current_user.is_authenticated:
+        return render_template('login_for_authenticated.html')
     message = ''
     if request.method == 'POST':
         print(request.form)
@@ -52,7 +55,7 @@ def login():
 
         if check_password_hash(password_, password):
             login_user(User(i, username, password))
-            message = 'login succesful'
+            return redirect(url_for('counter'))
         else:
             message = "login unsuccessful"
 
@@ -102,6 +105,11 @@ def aaaa():
 
 
 @login_manager.user_loader
+def load_user(id_):
+    ids, login, psw = user_repo.get_user_by_id(int(id_))
+    return User(ids, psw, login)
+
+
 class User(UserMixin):
     def __init__(self, id, login, password, active=True):
         self.id = id
@@ -109,27 +117,27 @@ class User(UserMixin):
         self.login = login
         self.active = active
 
-    def is_active(self):
-        # Here you should write whatever the code is
-        # that checks the database if your user is active
-        return self.active
+    # def is_active(self):
+    #     # Here you should write whatever the code is
+    #     # that checks the database if your user is active
+    #     return self.active
+    #
+    # def is_anonymous(self):
+    #     return False
+    #
+    # def is_authenticated(self):
+    #     return True
+    #
+    # def get_id(self):
+    #     return self.id
 
-    def is_anonymous(self):
-        return False
 
-    def is_authenticated(self):
-        return True
-
-    def get_id(self):
-        return (self.id)
-
-
-@login_manager.user_loader
-def load_user(id):
-    # 1. Fetch against the database a user by `id`
-    # 2. Create a new object of `User` class and return it.
-    _, login, hash = user_repo.get_user_by_id(id)
-    return User(id, login, hash)
+# @login_manager.user_loader
+# def load_user(id):
+#     # 1. Fetch against the database a user by `id`
+#     # 2. Create a new object of `User` class and return it.
+#     _, login, hash = user_repo.get_user_by_id(id)
+#     return User(id, login, hash)
 
 
 if __name__ == '__main__':
