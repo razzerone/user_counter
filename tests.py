@@ -10,6 +10,7 @@ from database import tables
 class UserCounterTest(unittest.TestCase):
     def setUp(self) -> None:
         self.engine = create_engine('sqlite:///test.db', echo=True)
+        tables.engine = self.engine
         tables.Base.metadata.create_all(self.engine)
         self.session_fabric = sessionmaker(bind=self.engine)
 
