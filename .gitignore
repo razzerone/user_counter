@@ -1,6 +1,8 @@
 /venv
 /.idea
 /__pycache__
+/Domain/__pycache__
+/domain/__pycache__
 
 /test.db
 /database.db
