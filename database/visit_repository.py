@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from Domain.Visit import Visit
+from domain.visit import Visit
 
 import setting
 

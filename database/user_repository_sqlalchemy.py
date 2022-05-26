@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 
 from database.tables import engine
 from database.tables import DatabaseUser
-from database.UserRepository import UserRepository
+from database.user_repository import UserRepository
 
 
 class UsersRepositoryImpl(UserRepository):

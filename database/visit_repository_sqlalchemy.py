@@ -2,7 +2,7 @@ from typing import Tuple, Any
 
 from sqlalchemy.orm import sessionmaker
 
-from database.VisitsRepository import VisitsRepository
+from database.visit_repository import VisitsRepository
 from database.tables import engine, DatabaseVisit
 
 
