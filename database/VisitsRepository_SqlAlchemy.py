@@ -1,18 +1,19 @@
 from typing import Tuple, Any
 
-from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
-from Domain.Visit import Visit
+
 from database.VisitsRepository import VisitsRepository
 from database.tables import engine, DatabaseVisit
 
 
 class VisitsRepositoryImpl(VisitsRepository):
+    """Данный класс является реализацией VisitsRepository,которая работает,опираясь на SqlAlchemy."""
     def __init__(self):
         self.engine = engine
         self.session_factory = sessionmaker(bind=engine)
 
     def add_new_visit(self, ip: str, page: str, user_agent: str, country: str, user_id: int | None) -> int:
+        """Реализация добавления записи в базу данных."""
         session = self.session_factory()
         visit = DatabaseVisit(
             ip=ip,
@@ -27,6 +28,7 @@ class VisitsRepositoryImpl(VisitsRepository):
         return visit.id
 
     def get_last(self) -> tuple[Any, Any, Any, Any, Any, Any, Any]:
+        """Реализация получения последней записи из базы данных."""
         session = self.session_factory()
 
         visit = session.query(DatabaseVisit).order_by(DatabaseVisit.id.desc()).first()
@@ -41,6 +43,7 @@ class VisitsRepositoryImpl(VisitsRepository):
                 )
 
     def get_first(self) -> tuple[Any, Any, Any, Any, Any, Any, Any]:
+        """Реализация получения первой записи из базы данных."""
         session = self.session_factory()
 
         visit = session.query(DatabaseVisit).order_by(DatabaseVisit.id).first()
@@ -55,6 +58,7 @@ class VisitsRepositoryImpl(VisitsRepository):
                 )
 
     def get_users_count(self) -> int:
+        """Реализация получения количество записей из базы данных."""
         session = self.session_factory()
         count = session.query(DatabaseVisit).count()
         session.commit()
@@ -62,6 +66,7 @@ class VisitsRepositoryImpl(VisitsRepository):
         return count
 
     def get_records_by_id(self, id) -> tuple[tuple[Any, Any, Any, Any, Any, Any, Any]]:
+        """Реализация получения записей, соответствующих определенному пользователю, из базы данных."""
         session = self.session_factory()
         visits = session.query(DatabaseVisit).filter(DatabaseVisit.user_id == id).all()
         session.commit()
@@ -75,6 +80,7 @@ class VisitsRepositoryImpl(VisitsRepository):
                    )
 
     def get_all_records(self) -> tuple[tuple[Any, Any, Any, Any, Any, Any, Any]]:
+        """Реализация получения всех записей из базы данных."""
         session = self.session_factory()
         visits = session.query(DatabaseVisit).all()
         session.commit()

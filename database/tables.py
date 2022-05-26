@@ -8,6 +8,7 @@ Base = declarative_base()
 
 
 class DatabaseUser(Base):
+    """Этот класс описывает те данные, которые необходимы для хранения пользователей в базе данных."""
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     login = Column(String)
@@ -18,6 +19,7 @@ class DatabaseUser(Base):
 
 
 class DatabaseVisit(Base):
+    """Этот класс описывает те данные, которые необходимы для хранения записей в базе данных."""
     __tablename__ = 'visits'
     id = Column(Integer, primary_key=True)
     ip = Column(String)
