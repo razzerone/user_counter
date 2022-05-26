@@ -1,1 +1,9 @@
 /venv
+/.idea
+/__pycache__
+
+/test.db
+/database.db
+/data.db
+
+/Procfile
