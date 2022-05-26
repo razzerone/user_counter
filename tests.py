@@ -1,19 +1,12 @@
-import datetime
-import sqlite3
 import unittest
-from urllib.parse import urlparse
 
-from flask import Flask
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from SQLite_impl import SQLiteRepository
 from app import app
-from database.UserRepository_SqlAlchemy import UsersRepositoryImpl
-from database.VisitsRepository_SqlAlchemy import VisitsRepositoryImpl
-from database.tables import Base, engine
+from database import tables
 from smart_repo import SmartRepo
-from user_counter import UserCounter
 
 
 class SmarterRepoTest(unittest.TestCase):
@@ -83,35 +76,58 @@ class SqlTes(unittest.TestCase):
 
 
 class UserCounterTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.engine = create_engine('sqlite:///test.db', echo=True)
+        tables.Base.metadata.create_all(self.engine)
+        self.session_fabric = sessionmaker(bind=self.engine)
+
+    def tearDown(self) -> None:
+        with self.session_fabric() as s:
+            s.query(tables.DatabaseUser).delete()
+            s.query(tables.DatabaseVisit).delete()
+            s.commit()
+
     def test_main(self):
         response = app.test_client().get('/')
 
         self.assertIsInstance(response.data, bytes)
 
-    def test_reacheable(self):
-        response = app.test_client().get('/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_reacheable(self):
+    def test_reachable(self):
         response = app.test_client().get('/')
         self.assertEqual(response.status_code, 200)
 
     def test_suc_login_request(self):
-        resp = app.test_client().post('/login', data=dict(username='111', password='111'), follow_redirects=True)
+        resp = app.test_client().post(
+            '/login',
+            data=dict(username='111', password='111'),
+            follow_redirects=True
+        )
         self.assertIn('http://localhost/auth', str(resp.request))
 
     def test_bad_login_request(self):
-        resp = app.test_client().post('/login', data=dict(username='123', password='123'), follow_redirects=True)
+        resp = app.test_client().post(
+            '/login',
+            data=dict(username='123', password='123'),
+            follow_redirects=True
+        )
 
         self.assertIn('http://localhost/login', str(resp.request))
 
     def test_good_validate(self):
-        resp = app.test_client().post('/validate_reg', data=dict(username='111', password='111'), follow_redirects=True)
+        resp = app.test_client().post(
+            '/validate_reg',
+            data=dict(username='111', password='111'),
+            follow_redirects=True
+        )
         self.assertIn('User already exists', str(resp.data))
 
     def test_add_counter(self):
         resp1 = app.test_client().get('/count')
-        app.test_client().post('/login', data=dict(username='111', password='111'), follow_redirects=True)
+        app.test_client().post(
+            '/login',
+            data=dict(username='111', password='111'),
+            follow_redirects=True
+        )
         resp2 = app.test_client().get('/count')
 
         self.assertNotEqual(resp1.data, resp2.data)
@@ -124,7 +140,11 @@ class UserCounterTest(unittest.TestCase):
 
     def test_last(self):
         resp1 = app.test_client().get('/last')
-        app.test_client().post('/login', data=dict(username='111', password='111'), follow_redirects=True)
+        app.test_client().post(
+            '/login',
+            data=dict(username='111', password='111'),
+            follow_redirects=True
+        )
         resp2 = app.test_client().get('/last')
         self.assertNotEqual(resp1.data, resp2.data)
 
@@ -140,7 +160,11 @@ class UserCounterTest(unittest.TestCase):
 
     def test_all_data_onAdd(self):
         resp1 = app.test_client().get('/all')
-        app.test_client().post('/login', data=dict(username='111', password='111'), follow_redirects=True)
+        app.test_client().post(
+            '/login',
+            data=dict(username='111', password='111'),
+            follow_redirects=True
+        )
         resp2 = app.test_client().get('/all')
         self.assertNotEqual(resp1.data, resp2.data)
 
