@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 

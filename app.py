@@ -8,8 +8,8 @@ from datetime import timedelta
 from flask import Flask
 from flask_login import LoginManager
 
-from database.UserRepository_SqlAlchemy import UsersRepositoryImpl
-from database.VisitsRepository_SqlAlchemy import VisitsRepositoryImpl
+from database.user_repository_sqlalchemy import UsersRepositoryImpl
+from database.visit_repository_sqlalchemy import VisitsRepositoryImpl
 
 from user_counter import UserCounter
 
