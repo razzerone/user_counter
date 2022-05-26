@@ -14,6 +14,10 @@ class UserCounterTest(unittest.TestCase):
         tables.Base.metadata.create_all(self.engine)
         self.session_fabric = sessionmaker(bind=self.engine)
 
+        with self.session_fabric() as s:
+            s.add(tables.DatabaseUser(login='111', password_hash='111'))
+            s.commit()
+
     def tearDown(self) -> None:
         with self.session_fabric() as s:
             s.query(tables.DatabaseUser).delete()
