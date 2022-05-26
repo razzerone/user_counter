@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>
+<header>
+    <link rel="stylesheet" href='/static/mainpagestile.css'/>
+    <div class="container">
+        <h1 class="logo">navigation</h1>
+        <strong>
+            <nav>
+                <ul class="menu">
+                    <li><a href="{{ url_for('login') }}">Go To Login</a></li>
+                    <li><a href="{{ url_for('anon') }}">Use as anonymous user</a></li>
+                </ul>
+            </nav>
+        </strong>
+    </div>
+</header>
+
+</body>
+</html>

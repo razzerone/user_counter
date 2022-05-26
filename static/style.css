@@ -1,0 +1,37 @@
+body {
+  font:italic small-caps bold 12px/2 cursive;
+  background-color:#D9C9BA;
+  text-align: center;
+}
+h1{
+    font:fantasy;
+    left:20px;
+}
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  border: 8px solid #403D3D;
+
+}
+tr
+{
+    text-align: center;
+    vertical-align: middle;
+
+}
+tr:nth-child(even) {
+  background-color: #BFB0A3;
+}
+
+td
+{
+border: 8px solid #403D3D;
+}
+th
+{
+    border: 8px solid #403D3D;
+}
+th:nth-child(even),td:nth-child(even) {
+  background-color: #D9C9BA;
+}

@@ -1,16 +1,16 @@
 from flask import request, session, render_template, redirect, url_for
 from flask_login import login_required, UserMixin, login_user, current_user
 
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 import secrets
 from datetime import timedelta
 
 from flask import Flask
 from flask_login import LoginManager
-from peewee import SqliteDatabase
 
-from database.UserRepository_SqlAlchemy import UsersRepo
-from smart_repo import SmartRepo
+from database.UserRepository_SqlAlchemy import UsersRepositoryImpl
+from database.VisitsRepository_SqlAlchemy import VisitsRepositoryImpl
+
 from user_counter import UserCounter
 
 app = Flask(__name__)
@@ -18,27 +18,50 @@ app.secret_key = secrets.token_bytes()
 
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
-repo = SmartRepo()
-user_counter = UserCounter(repo)
-user_repo = UsersRepo()
-db = SqliteDatabase('data.db')
+repo = VisitsRepositoryImpl()
+user_repo = UsersRepositoryImpl()
+user_counter = UserCounter(repo, user_repo)
+
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
 @app.route('/')
-@login_required
 def counter():
+    return render_template("mainpage.html")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.route('/auth')
+@login_required
+def auth():
+    print(session['id'])
+    user_counter.add_visitor(
+        request.remote_addr,
+        request.path,
+        request.user_agent.string,
+        session['id'],
+
+    )
+    return render_template("layout.html")
+
+
+@app.route('/anon')
+def anon():
     if 'visited' not in session:
         session['visited'] = True
         user_counter.add_visitor(
             request.remote_addr,
             request.path,
-            request.user_agent.string
+            request.user_agent.string,
+            None
         )
-
-    return render_template("layout.html")
+    return render_template("layoutforanonymo.html")
 
 
 @app.route('/login', methods=['post', 'get'])
@@ -47,17 +70,19 @@ def login():
         return render_template('login_for_authenticated.html')
     message = ''
     if request.method == 'POST':
-        print(request.form)
         username = request.form.get('username')
         password = request.form.get('password')
-
-        i, login_, password_ = user_repo.get_user_by_login(username)
-
-        if check_password_hash(password_, password):
-            login_user(User(i, username, password))
-            return redirect(url_for('counter'))
+        a = user_repo.get_user_by_login(username)
+        if a is None:
+            message = "User does not exist"
         else:
-            message = "login unsuccessful"
+            i, login_, password_ = a
+            if check_password_hash(password_, password):
+                session['id'] = i
+                login_user(User(i, username, password))
+                return redirect(url_for('auth'))
+            else:
+                message = "Login failed"
 
     return render_template('login.html', message=message)
 
@@ -72,36 +97,38 @@ def validate():
     name = request.form.get('name')
     password = request.form.get('password')
     if user_repo.get_user_by_login(name) is not None:
-        return render_template('signup.html', message="пользователь существует")
+        return render_template('signup.html', message="User already exists")
     user_repo.add_new_user(name, password)
-    return render_template('signup.html', message="пользователь зарегистрирован")
+    return render_template('signup.html', message="User has been registered")
 
 
 @app.route('/last')
 def last_user():
-    return str(repo.get_last())
+    return render_template("last_second.html", line=repo.get_last())
 
 
 @app.route('/first')
 def first_user():
-    return str(repo.get_first())
+    return render_template("last_second.html", line=repo.get_first())
 
 
 @app.route('/count')
 def count():
-    return str(repo.get_users_count())
+    return render_template("for_counter.html", counter=repo.get_users_count())
 
 
 @app.route('/all')
 def all_users():
-    users = [user for user in repo.get_all_users()]
+    users = [user for user in repo.get_all_records()]
 
-    return render_template("view.html", list=users)
+    return render_template("view.html", table=users)
 
 
 @app.route('/profile')
-def aaaa():
-    return "aaa"
+def profile():
+    aaa = list(repo.get_records_by_id(session['id']))
+
+    return render_template("view.html", table=aaa)
 
 
 @login_manager.user_loader
@@ -116,28 +143,6 @@ class User(UserMixin):
         self.password_hash = password
         self.login = login
         self.active = active
-
-    # def is_active(self):
-    #     # Here you should write whatever the code is
-    #     # that checks the database if your user is active
-    #     return self.active
-    #
-    # def is_anonymous(self):
-    #     return False
-    #
-    # def is_authenticated(self):
-    #     return True
-    #
-    # def get_id(self):
-    #     return self.id
-
-
-# @login_manager.user_loader
-# def load_user(id):
-#     # 1. Fetch against the database a user by `id`
-#     # 2. Create a new object of `User` class and return it.
-#     _, login, hash = user_repo.get_user_by_id(id)
-#     return User(id, login, hash)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Login page</title>
-    <link rel="stylesheet" href='/static/main.css'/>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -11,8 +11,9 @@
 
     <form action="" method="post">
         <input type="text" placeholder="Username" name="username">
-        <input type="password" placeholder="Password" name="password">
+        <input type="text" placeholder="Password" name="password">
         <input class="btn btn-default" type="submit" value="Login">
+        <br>
         <a href="{{ url_for('signup') }}">Sign up</a>
         <p>
             {{message}}

@@ -1,9 +1,29 @@
-<link rel="stylesheet" href='/static/main.css'/>
+<link rel="stylesheet" href='/static/mystyle.css'/>
 <html>
 <head>
-    {% for your_list_element in list %}
-    <p>{{ your_list_element }} </p>
-    {% endfor %}
+
+    <table>
+        <tr>
+            <th>Number</th>
+            <th>Adress</th>
+            <th>Page</th>
+            <th>Time</th>
+            <th>Useragent</th>
+            <th>Country</th>
+            <th>User-Id</th>
+        </tr>
+        {% for row in table %}
+        <tr>
+            <td>{{row[0]}}</td>
+            <td>{{row[1]}}</td>
+            <td>{{row[2]}}</td>
+            <td>{{row[3]}}</td>
+            <td>{{row[4]}}</td>
+            <td>{{row[5]}}</td>
+            <td>{{row[6]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </head>
 <body>
 </body>

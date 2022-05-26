@@ -4,16 +4,20 @@ import sys
 import requests
 from requests import HTTPError
 
+from database.UserRepository import UserRepository
+from database.VisitsRepository import VisitsRepository
 from repository import Repository
 
 
 class UserCounter:
-    def __init__(self, user_repository: Repository):
+    def __init__(self, visit_repository: VisitsRepository, user_repository: UserRepository):
+        self._visit_repo = visit_repository
         self._user_repo = user_repository
 
-    def add_visitor(self, ip: str, page: str, user_agent: str):
+    def add_visitor(self, ip: str, page: str, user_agent: str, user_id: int | None) -> int:
         country = self.get_ip_country(ip)
-        self._user_repo.add_new_user(ip, page, user_agent, country)
+
+        return self._visit_repo.add_new_visit(ip, page, user_agent, country, user_id)
 
     @staticmethod
     def get_ip_country(ip: str):
