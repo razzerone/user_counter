@@ -64,13 +64,45 @@ class UserCounterTest(unittest.TestCase):
         )
         self.assertIn('http://localhost/auth', str(resp.request))
 
-    def test_bad_login_msg(self):
+    def test_nonexistent_user_login_msg(self):
         resp = app.test_client().post(
             '/login',
             data=dict(username='123', password='123'),
             follow_redirects=True
         )
         self.assertIn('User does not exist', str(resp.data))
+
+    def test_failed_login_msg(self):
+        resp = app.test_client().post(
+            '/login',
+            data=dict(username='111', password='123'),
+            follow_redirects=True
+        )
+        self.assertIn('Login failed', str(resp.data))
+
+    def test_login_empty_data_msg(self):
+        resp = app.test_client().post(
+            '/login',
+            data=dict(username='', password=''),
+            follow_redirects=True
+        )
+        self.assertIn('Invalid credentials', str(resp.data))
+
+    def test_login_empty_login_msg(self):
+        resp = app.test_client().post(
+            '/login',
+            data=dict(username='', password='11'),
+            follow_redirects=True
+        )
+        self.assertIn('Invalid username', str(resp.data))
+
+    def test_login_empty_password_msg(self):
+        resp = app.test_client().post(
+            '/login',
+            data=dict(username='user', password=''),
+            follow_redirects=True
+        )
+        self.assertIn('Invalid password', str(resp.data))
 
     def test_bad_login_request(self):
         resp = app.test_client().post(
@@ -96,6 +128,30 @@ class UserCounterTest(unittest.TestCase):
             follow_redirects=True
         )
         self.assertIn('User has been registered', str(resp.data))
+
+    def test_empty_login_validate(self):
+        resp = app.test_client().post(
+            '/validate_reg',
+            data=dict(password='123'),
+            follow_redirects=True
+        )
+        self.assertIn('Invalid username', str(resp.data))
+
+    def test_empty_password_validate(self):
+        resp = app.test_client().post(
+            '/validate_reg',
+            data=dict(username='123'),
+            follow_redirects=True
+        )
+        self.assertIn('Invalid password', str(resp.data))
+
+    def test_empty_data_validate(self):
+        resp = app.test_client().post(
+            '/validate_reg',
+            data=dict(),
+            follow_redirects=True
+        )
+        self.assertIn('Invalid credentials', str(resp.data))
 
     def test_add_counter(self):
         resp1 = app.test_client().get('/count')
@@ -152,6 +208,23 @@ class UserCounterTest(unittest.TestCase):
         resp1 = app.test_client().get('/all')
         resp2 = app.test_client().get('/all')
         self.assertEqual(resp1.data, resp2.data)
+
+    def test_profile_after_login(self):
+        app.test_client().post(
+            '/login',
+            data=dict(username='111', password='111'),
+            follow_redirects=True
+        )
+        resp1 = app.test_client().get('/profile')
+        self.assertIn('111', str(resp1.data))
+    def test_profile_anon(self):
+
+        resp1 = app.test_client().get('/profile')
+        self.assertEqual(302, resp1.status_code)
+    def test_profile_anon(self):
+
+        resp1 = app.test_client().get('/profile')
+        self.assertIn('/login', str(resp1.data))
 
 
 if __name__ == '__main__':

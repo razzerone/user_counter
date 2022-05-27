@@ -46,7 +46,7 @@ class UsersRepositoryImpl(UserRepository):
         """Реализация получения пользователя по логину."""
         with self.session_factory() as session:
             user = session.query(DatabaseUser).filter(
-                DatabaseUser.login == login).one_or_none()
+                DatabaseUser.login == login).first()
             session.commit()
 
             if user is None:

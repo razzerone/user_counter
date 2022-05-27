@@ -1,4 +1,8 @@
-from flask import request, session, render_template, redirect, url_for
+import os
+
+import werkzeug
+from flask import request, session, render_template, redirect, url_for, \
+    send_from_directory
 from flask_login import login_required, UserMixin, login_user, current_user, \
     logout_user
 
@@ -13,7 +17,7 @@ from database import tables
 from database.user_repository_sqlalchemy import UsersRepositoryImpl
 from database.visit_repository_sqlalchemy import VisitsRepositoryImpl
 from domain.messages import INVALID_PASSWORD, INVALID_USERNAME, \
-    USER_ALREADY_EXISTS, USER_NOT_EXIST, USER_REGISTERED
+    USER_ALREADY_EXISTS, USER_NOT_EXIST, USER_REGISTERED, INVALID_CREDENTIALS
 from domain.names import ID, PASSWORD, USERNAME, VISITED
 
 from user_counter import UserCounter
@@ -35,11 +39,12 @@ login_manager.login_view = 'login'
 @app.route('/')
 def counter():
     """Функция, отвечающая за отображение главной страницы."""
+
     return render_template("main_page.html")
 
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(_):
     """Функция, отвечающая за отображение любой несуществующей страницы."""
     return render_template('404.html'), 404
 
@@ -78,7 +83,6 @@ def login():
     """
     Функция, отвечающая за страницу, открывающуюся для пользователей,
     пожелавших остаться анонимными.
-
     Внутри происходит обработка вводимых данных - проверяются логин и пароль.
     Если они есть в базе данных, то выполняется вход и посещение заносится в
     базу данных.
@@ -87,11 +91,13 @@ def login():
         return render_template('login_for_authenticated.html')
 
     if request.method == 'POST':
-        username = request.form.get(USERNAME)
-        password = request.form.get(PASSWORD)
-        if username is None:
+        username = request.form.get(USERNAME).strip()
+        password = request.form.get(PASSWORD).strip()
+        if username == '' and password == '':
+            return render_template('login.html', message=INVALID_CREDENTIALS)
+        if username == '':
             return render_template('login.html', message=INVALID_USERNAME)
-        if password is None:
+        if password == '':
             return render_template('login.html', message=INVALID_PASSWORD)
 
         resp = user_repo.get_user_by_login(username)
@@ -123,12 +129,15 @@ def signup():
 @app.route('/validate_reg', methods=['GET', 'POST'])
 def validate():
     """Функция, отвечающая за валидацию регистрируемого пользователя."""
-    name = request.form.get(USERNAME)
-    if name is None:
+    if request.form.get(USERNAME) is None \
+            and request.form.get(PASSWORD) is None:
+        return render_template('signup.html', message=INVALID_CREDENTIALS)
+    if request.form.get(USERNAME) is None:
         return render_template('signup.html', message=INVALID_USERNAME)
-    password = request.form.get(PASSWORD)
-    if password is None:
+    name = request.form.get(USERNAME).strip()
+    if request.form.get(PASSWORD) is None:
         return render_template('signup.html', message=INVALID_PASSWORD)
+    password = request.form.get(PASSWORD).strip()
     if user_repo.get_user_by_login(name) is not None:
         return render_template('signup.html', message=USER_ALREADY_EXISTS)
     user_repo.add_new_user(name, password)
@@ -144,6 +153,13 @@ def last_user():
     return render_template(
         "last_second.html",
         line=visit_repo.get_last())
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico',
+                               mimetype='image/vnd.microsoft.icon')
 
 
 @app.route("/logout")
@@ -189,6 +205,7 @@ def all_users():
 
 
 @app.route('/profile')
+@login_required
 def profile():
     """
     Функция, отвечающая за отображение страницы, показывающей все посещения
