@@ -194,6 +194,17 @@ class UserCounterTest(unittest.TestCase):
         resp2 = app.test_client().get('/first')
         self.assertEqual(resp1.data, resp2.data)
 
+    def test_first_add(self):
+        app.test_client().get('/anon')
+        resp1 = app.test_client().get('/first')
+        app.test_client().post(
+            '/login',
+            data=dict(username='111', password='111'),
+            follow_redirects=True
+        )
+        resp2 = app.test_client().get('/first')
+        self.assertEqual(resp1.data, resp2.data)
+
     def test_all_data_onAdd(self):
         resp1 = app.test_client().get('/all')
         app.test_client().post(
@@ -209,19 +220,14 @@ class UserCounterTest(unittest.TestCase):
         resp2 = app.test_client().get('/all')
         self.assertEqual(resp1.data, resp2.data)
 
-    def test_profile_after_login(self):
-        app.test_client().post(
-            '/login',
-            data=dict(username='111', password='111'),
-            follow_redirects=True
-        )
-        resp1 = app.test_client().get('/profile')
-        self.assertIn('111', str(resp1.data))
-    def test_profile_anon(self):
+
+
+    def test_profile_anon_code(self):
 
         resp1 = app.test_client().get('/profile')
         self.assertEqual(302, resp1.status_code)
-    def test_profile_anon(self):
+
+    def test_profile_anon_msg(self):
 
         resp1 = app.test_client().get('/profile')
         self.assertIn('/login', str(resp1.data))
