@@ -64,6 +64,14 @@ class UserCounterTest(unittest.TestCase):
         )
         self.assertIn('http://localhost/auth', str(resp.request))
 
+    def test_bad_login_msg(self):
+        resp = app.test_client().post(
+            '/login',
+            data=dict(username='123', password='123'),
+            follow_redirects=True
+        )
+        self.assertIn('User does not exist', str(resp.data))
+
     def test_bad_login_request(self):
         resp = app.test_client().post(
             '/login',
@@ -80,6 +88,14 @@ class UserCounterTest(unittest.TestCase):
             follow_redirects=True
         )
         self.assertIn('User already exists', str(resp.data))
+
+    def test_new_validate(self):
+        resp = app.test_client().post(
+            '/validate_reg',
+            data=dict(username='123', password='123'),
+            follow_redirects=True
+        )
+        self.assertIn('User has been registered', str(resp.data))
 
     def test_add_counter(self):
         resp1 = app.test_client().get('/count')
