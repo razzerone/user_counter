@@ -7,7 +7,7 @@
     <table>
         <tr>
             <th>Number</th>
-            <th>Adress</th>
+            <th>Address</th>
             <th>Page</th>
             <th>Time</th>
             <th>Useragent</th>
@@ -15,13 +15,13 @@
             <th>User-Id</th>
         </tr>
         <tr>
-            <td>{{line[0]}}</td>
-            <td>{{line[1]}}</td>
-            <td>{{line[2]}}</td>
-            <td>{{line[3]}}</td>
-            <td>{{line[4]}}</td>
-            <td>{{line[5]}}</td>
-            <td>{{line[6]}}</td>
+            <td>{{ line.id }}</td>
+            <td>{{ line.ip }}</td>
+            <td>{{ line.page }}</td>
+            <td>{{ line.time }}</td>
+            <td>{{ line.user_agent }}</td>
+            <td>{{ line.country }}</td>
+            <td>{{ 'anonymous' if line.user_id is none else line.user_id }}</td>
         </tr>
     </table>
 </head>

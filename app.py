@@ -141,7 +141,6 @@ def last_user():
     Функция, отвечающая за отображение страницы, показывающей последнюю запись
     о входе.
     """
-    resp = visit_repo.get_last()
     return render_template(
         "last_second.html",
         line=visit_repo.get_last())
@@ -171,8 +170,10 @@ def count():
     Функция, отвечающая за отображение страницы, показывающей количество
     посещений сайта.
     """
-    return render_template("for_counter.html",
-                           counter=visit_repo.get_users_count())
+    return render_template(
+        "for_counter.html",
+        counter=visit_repo.get_users_count()
+    )
 
 
 @app.route('/all')
@@ -181,9 +182,10 @@ def all_users():
     Функция, отвечающая за отображение страницы, показывающей все посещения
     сайта.
     """
-    users = list(visit_repo.get_all_records())
-
-    return render_template("view.html", table=users)
+    return render_template(
+        "view.html",
+        table=visit_repo.get_all_records()
+    )
 
 
 @app.route('/profile')
@@ -192,9 +194,10 @@ def profile():
     Функция, отвечающая за отображение страницы, показывающей все посещения
     сайта конкретным пользователем.
     """
-    user_list = list(visit_repo.get_records_by_id(session[ID]))
-
-    return render_template("view.html", table=user_list)
+    return render_template(
+        "view.html",
+        table=visit_repo.get_records_by_id(session[ID])
+    )
 
 
 @login_manager.user_loader

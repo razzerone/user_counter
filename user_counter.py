@@ -29,10 +29,7 @@ class UserCounter:
         """Функция, определяющая страну, из которой было выполнено посещение, по входному IP-адресу."""
         try:
             response = requests.get(f"https://ipinfo.io/{ip}/json")
-        except ConnectionError as e:
-            print('Проблемы при соединении с сетью')
-            sys.exit(-1)
-        except HTTPError as e:
+        except (ConnectionError, HTTPError):
             return '*'
 
         content = json.loads(response.content)

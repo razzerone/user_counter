@@ -15,7 +15,7 @@ from user_counter import UserCounter
 
 class UserCounterTest(unittest.TestCase):
     def setUp(self):
-        self.engine = create_engine('sqlite:///test.db', echo=True)
+        self.engine = create_engine('sqlite:///test.db', echo=False)
 
         app_file.visit_repo = VisitsRepositoryImpl(engine=self.engine)
         app_file.user_repo = UsersRepositoryImpl(engine=self.engine)
@@ -93,12 +93,14 @@ class UserCounterTest(unittest.TestCase):
         self.assertNotEqual(resp1.data, resp2.data)
 
     def test_idempotency_counter(self):
+        app.test_client().get('/anon')
         resp1 = app.test_client().get('/count')
         resp2 = app.test_client().get('/count')
 
         self.assertEqual(resp1.data, resp2.data)
 
     def test_last(self):
+        app.test_client().get('/anon')
         resp1 = app.test_client().get('/last')
         app.test_client().post(
             '/login',
@@ -109,11 +111,13 @@ class UserCounterTest(unittest.TestCase):
         self.assertNotEqual(resp1.data, resp2.data)
 
     def test_last_idempotency(self):
+        app.test_client().get('/anon')
         resp1 = app.test_client().get('/last')
         resp2 = app.test_client().get('/last')
         self.assertEqual(resp1.data, resp2.data)
 
     def test_first_idempotency(self):
+        app.test_client().get('/anon')
         resp1 = app.test_client().get('/first')
         resp2 = app.test_client().get('/first')
         self.assertEqual(resp1.data, resp2.data)
