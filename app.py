@@ -1,5 +1,6 @@
 from flask import request, session, render_template, redirect, url_for
-from flask_login import login_required, UserMixin, login_user, current_user, logout_user
+from flask_login import login_required, UserMixin, login_user, current_user, \
+    logout_user
 
 from werkzeug.security import check_password_hash
 import secrets
@@ -11,6 +12,9 @@ from flask_login import LoginManager
 from database import tables
 from database.user_repository_sqlalchemy import UsersRepositoryImpl
 from database.visit_repository_sqlalchemy import VisitsRepositoryImpl
+from domain.messages import INVALID_PASSWORD, INVALID_USERNAME, \
+    USER_ALREADY_EXISTS, USER_NOT_EXIST, USER_REGISTERED
+from domain.names import ID, PASSWORD, USERNAME, VISITED
 
 from user_counter import UserCounter
 
@@ -31,7 +35,7 @@ login_manager.login_view = 'login'
 @app.route('/')
 def counter():
     """Функция, отвечающая за отображение главной страницы."""
-    return render_template("mainpage.html")
+    return render_template("main_page.html")
 
 
 @app.errorhandler(404)
@@ -43,64 +47,71 @@ def page_not_found():
 @app.route('/auth')
 @login_required
 def auth():
-    """Функция, отвечающая за страницу,открывающуюся после выполнения входа."""
+    """
+    Функция, отвечающая за страницу, открывающуюся после выполнения входа.
+    """
     return render_template("layout.html")
 
 
 @app.route('/anon')
 def anon():
     """
-    Функция, отвечающая за страницу, открывающуюся для пользователей, пожелавших остаться анонимными.
+    Функция, отвечающая за страницу, открывающуюся
+    для пользователей, пожелавших остаться анонимными.
 
-
-    Внутри так же происходит обработка посещения - если в данной сессии пользователь уже
-    посещал страницу, то его посещение можно не считать.
+    Внутри так же происходит обработка посещения - если в данной сессии
+    пользователь уже посещал страницу, то его посещение можно не считать.
     """
-    if 'visited' not in session:
-        session['visited'] = True
+    if VISITED not in session:
+        session[VISITED] = True
         user_counter.add_visitor(
             request.remote_addr,
             request.path,
             request.user_agent.string,
             None
         )
-    return render_template("layoutforanonymo.html")
+    return render_template("layout_anonymous.html")
 
 
-@app.route('/login', methods=['post', 'get'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     """
-    Функция, отвечающая за страницу, открывающуюся для пользователей, пожелавших остаться анонимными.
+    Функция, отвечающая за страницу, открывающуюся для пользователей,
+    пожелавших остаться анонимными.
 
-
-    Внутри  происходит обработка вводимых данных - проверяются логин и пароль.Если они есть в базе данных,
-    то выполняется вход и посещение заносится в базу данных.
+    Внутри происходит обработка вводимых данных - проверяются логин и пароль.
+    Если они есть в базе данных, то выполняется вход и посещение заносится в
+    базу данных.
     """
     if current_user.is_authenticated:
         return render_template('login_for_authenticated.html')
-    message = ''
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        a = user_repo.get_user_by_login(username)
-        if a is None:
-            message = "User does not exist"
-        else:
-            i, login_, password_ = a
-            if check_password_hash(password_, password):
-                session['id'] = i
-                login_user(User(i, username, password))
-                user_counter.add_visitor(
-                    request.remote_addr,
-                    request.path,
-                    request.user_agent.string,
-                    session['id']
-                )
-                return redirect(url_for('auth'))
-            else:
-                message = "Login failed"
 
-    return render_template('login.html', message=message)
+    if request.method == 'POST':
+        username = request.form.get(USERNAME)
+        password = request.form.get(PASSWORD)
+        if username is None:
+            return render_template('login.html', message=INVALID_USERNAME)
+        if password is None:
+            return render_template('login.html', message=INVALID_PASSWORD)
+
+        resp = user_repo.get_user_by_login(username)
+        if resp is None:
+            return render_template('login.html', message=USER_NOT_EXIST)
+
+        id_, login_, password_ = resp.id, resp.login, resp.password_hash
+        if check_password_hash(password_, password):
+            session[ID] = id_
+            login_user(User(id_, username, password))
+            user_counter.add_visitor(
+                request.remote_addr,
+                request.path,
+                request.user_agent.string,
+                session[ID]
+            )
+            return redirect(url_for('auth'))
+        return render_template('login.html', message='Login failed')
+
+    return render_template('login.html', message='')
 
 
 @app.route('/signup')
@@ -112,72 +123,97 @@ def signup():
 @app.route('/validate_reg', methods=['GET', 'POST'])
 def validate():
     """Функция, отвечающая за валидацию регистрируемого пользователя."""
-    name = request.form.get('username')
+    name = request.form.get(USERNAME)
     if name is None:
-        return render_template('signup.html', message="Invalid username")
-    password = request.form.get('password')
+        return render_template('signup.html', message=INVALID_USERNAME)
+    password = request.form.get(PASSWORD)
     if password is None:
-        return render_template('signup.html', message="Invalid password")
+        return render_template('signup.html', message=INVALID_PASSWORD)
     if user_repo.get_user_by_login(name) is not None:
-        return render_template('signup.html', message="User already exists")
+        return render_template('signup.html', message=USER_ALREADY_EXISTS)
     user_repo.add_new_user(name, password)
-    return render_template('signup.html', message="User has been registered")
+    return render_template('signup.html', message=USER_REGISTERED)
 
 
 @app.route('/last')
 def last_user():
-    """Функция, отвечающая за отображение страницы, показывающей последнюю запись о входе."""
-    return render_template("last_second.html", line=visit_repo.get_last())
+    """
+    Функция, отвечающая за отображение страницы, показывающей последнюю запись
+    о входе.
+    """
+    resp = visit_repo.get_last()
+    return render_template(
+        "last_second.html",
+        line=visit_repo.get_last())
 
 
 @app.route("/logout")
 def logout():
-    """Функция, отвечающая за выход пользователя и отображение главной страницы. """
+    """
+    Функция, отвечающая за выход пользователя и отображение главной страницы.
+    """
     logout_user()
-    return render_template("mainpage.html")
+    return render_template("main_page.html")
 
 
 @app.route('/first')
 def first_user():
-    """Функция, отвечающая за отображение страницы, показывающей первую запись о входе."""
+    """
+    Функция, отвечающая за отображение страницы, показывающей первую запись о
+    входе.
+    """
     return render_template("last_second.html", line=visit_repo.get_first())
 
 
 @app.route('/count')
 def count():
-    """Функция, отвечающая за отображение страницы, показывающей количество посещений сайта."""
-    return render_template("for_counter.html", counter=visit_repo.get_users_count())
+    """
+    Функция, отвечающая за отображение страницы, показывающей количество
+    посещений сайта.
+    """
+    return render_template("for_counter.html",
+                           counter=visit_repo.get_users_count())
 
 
 @app.route('/all')
 def all_users():
-    """Функция, отвечающая за отображение страницы, показывающей все посещения сайта."""
-    users = [user for user in visit_repo.get_all_records()]
+    """
+    Функция, отвечающая за отображение страницы, показывающей все посещения
+    сайта.
+    """
+    users = list(visit_repo.get_all_records())
 
     return render_template("view.html", table=users)
 
 
 @app.route('/profile')
 def profile():
-    """Функция, отвечающая за отображение страницы, показывающей все посещения сайта конкретным пользователем."""
-    aaa = list(visit_repo.get_records_by_id(session['id']))
+    """
+    Функция, отвечающая за отображение страницы, показывающей все посещения
+    сайта конкретным пользователем.
+    """
+    user_list = list(visit_repo.get_records_by_id(session[ID]))
 
-    return render_template("view.html", table=aaa)
+    return render_template("view.html", table=user_list)
 
 
 @login_manager.user_loader
 def load_user(id_):
-    """Функция, возвращающая пользователя, соотвествующего входному идентификатору."""
-    ids, login, psw = user_repo.get_user_by_id(int(id_))
-    return User(ids, psw, login)
+    """
+    Функция, возвращающая пользователя, соответствующего входному
+    идентификатору.
+    """
+    resp = user_repo.get_user_by_id(int(id_))
+    return User(id_, resp.login, resp.password_hash)
 
 
 class User(UserMixin):
     """Модель, необходимая Flask для хранения данных о пользователе."""
-    def __init__(self, id, login, password, active=True):
-        self.id = id
+
+    def __init__(self, id_, login_, password, active=True):
+        self.id = id_
         self.password_hash = password
-        self.login = login
+        self.login = login_
         self.active = active
 
 

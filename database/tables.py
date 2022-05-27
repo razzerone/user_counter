@@ -3,12 +3,15 @@ from sqlalchemy.ext.declarative import declarative_base
 
 import setting
 
-engine = create_engine(setting.database, connect_args={'check_same_thread': False}, echo=setting.debug)
+engine = create_engine(setting.database, echo=setting.debug)
 Base = declarative_base()
 
 
 class DatabaseUser(Base):
-    """Этот класс описывает те данные, которые необходимы для хранения пользователей в базе данных."""
+    """
+    Этот класс описывает те данные, которые необходимы для хранения
+    пользователей в базе данных.
+    """
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     login = Column(String)
@@ -19,7 +22,10 @@ class DatabaseUser(Base):
 
 
 class DatabaseVisit(Base):
-    """Этот класс описывает те данные, которые необходимы для хранения записей в базе данных."""
+    """
+    Этот класс описывает те данные, которые необходимы для хранения записей в
+    базе данных.
+    """
     __tablename__ = 'visits'
     id = Column(Integer, primary_key=True)
     ip = Column(String)
