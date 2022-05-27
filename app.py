@@ -1,5 +1,6 @@
 import os
 
+import flask
 import werkzeug
 from flask import request, session, render_template, redirect, url_for, \
     send_from_directory
@@ -8,11 +9,12 @@ from flask_login import login_required, UserMixin, login_user, current_user, \
 
 from werkzeug.security import check_password_hash
 import secrets
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from flask import Flask
 from flask_login import LoginManager
 
+import setting
 from database import tables
 from database.user_repository_sqlalchemy import UsersRepositoryImpl
 from database.visit_repository_sqlalchemy import VisitsRepositoryImpl
@@ -36,10 +38,16 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
+@app.before_request
+def before():
+    flask.session.permanent = True
+
+
 @app.route('/')
 def counter():
     """Функция, отвечающая за отображение главной страницы."""
-
+    if current_user.is_authenticated:
+        return flask.redirect(url_for('auth'))
     return render_template("main_page.html")
 
 
@@ -78,6 +86,32 @@ def anon():
     return render_template("layout_anonymous.html")
 
 
+def login_func(username, password):
+    if username == '' and password == '':
+        return render_template('login.html', message=INVALID_CREDENTIALS)
+    if username == '':
+        return render_template('login.html', message=INVALID_USERNAME)
+    if password == '':
+        return render_template('login.html', message=INVALID_PASSWORD)
+
+    resp = user_repo.get_user_by_login(username)
+    if resp is None:
+        return render_template('login.html', message=USER_NOT_EXIST)
+
+    id_, login_, password_ = resp.id, resp.login, resp.password_hash
+    if check_password_hash(password_, password):
+        session[ID] = id_
+        login_user(User(id_, username, password))
+        user_counter.add_visitor(
+            request.remote_addr,
+            request.path,
+            request.user_agent.string,
+            session[ID]
+        )
+        return redirect(url_for('auth'))
+    return render_template('login.html', message='Login failed')
+
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     """
@@ -93,31 +127,25 @@ def login():
     if request.method == 'POST':
         username = request.form.get(USERNAME).strip()
         password = request.form.get(PASSWORD).strip()
-        if username == '' and password == '':
-            return render_template('login.html', message=INVALID_CREDENTIALS)
-        if username == '':
-            return render_template('login.html', message=INVALID_USERNAME)
-        if password == '':
-            return render_template('login.html', message=INVALID_PASSWORD)
 
-        resp = user_repo.get_user_by_login(username)
-        if resp is None:
-            return render_template('login.html', message=USER_NOT_EXIST)
-
-        id_, login_, password_ = resp.id, resp.login, resp.password_hash
-        if check_password_hash(password_, password):
-            session[ID] = id_
-            login_user(User(id_, username, password))
-            user_counter.add_visitor(
-                request.remote_addr,
-                request.path,
-                request.user_agent.string,
-                session[ID]
-            )
-            return redirect(url_for('auth'))
-        return render_template('login.html', message='Login failed')
+        return login_func(username, password)
 
     return render_template('login.html', message='')
+
+
+@app.route('/bydate')
+def bydate():
+    return render_template('recordsbydate.html')
+
+
+@app.route('/recordsbydate', methods=['GET', 'POST'])
+def showbydate():
+    time=datetime.strptime(str(request.form.get('dateOne')),"%Y-%m-%d")\
+        .strftime('%d-%m-%Y')
+
+
+    table = visit_repo.get_records_by_date(str(time))
+    return render_template('view.html', table=table)
 
 
 @app.route('/signup')
@@ -141,7 +169,10 @@ def validate():
     if user_repo.get_user_by_login(name) is not None:
         return render_template('signup.html', message=USER_ALREADY_EXISTS)
     user_repo.add_new_user(name, password)
-    return render_template('signup.html', message=USER_REGISTERED)
+
+    return login_func(name, password)
+
+    # return render_template('s.html', message=USER_REGISTERED)
 
 
 @app.route('/last')

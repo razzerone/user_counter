@@ -1,5 +1,6 @@
 from typing import Any, Iterable
 
+from sqlalchemy import literal
 from sqlalchemy.orm import sessionmaker
 
 import domain.visit
@@ -79,6 +80,24 @@ class VisitsRepositoryImpl(VisitsRepository):
         visits = session.query(DatabaseVisit) \
             .filter(DatabaseVisit.user_id == id) \
             .all()
+        session.commit()
+        for visit in visits:
+            yield domain.visit.Visit(
+                id=visit.id,
+                ip=visit.ip,
+                page=visit.page,
+                time=visit.time,
+                user_agent=visit.user_agent,
+                country=visit.country,
+                user_id=visit.user_id,
+            )
+
+    def get_records_by_date(self, time) -> Iterable[domain.visit.Visit]:
+        """Реализация получения записей, соответствующих определенному пользователю, из базы данных."""
+        session = self.session_factory()
+        visits = session.query(DatabaseVisit) \
+            .filter(
+            DatabaseVisit.time.contains('26')).all()
         session.commit()
         for visit in visits:
             yield domain.visit.Visit(

@@ -1,0 +1,11 @@
+
+        <form name="date" id='form' action="{{ url_for('showbydate') }}" method="post">
+            <input type="date" name="dateOne" value="" onchange="sendForm()">
+
+
+        </form>
+<script>
+    function sendForm(){
+document.getElementById("form").submit();
+}
+</script>
