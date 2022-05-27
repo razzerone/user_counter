@@ -8,6 +8,7 @@ from datetime import timedelta
 from flask import Flask
 from flask_login import LoginManager
 
+from database import tables
 from database.user_repository_sqlalchemy import UsersRepositoryImpl
 from database.visit_repository_sqlalchemy import VisitsRepositoryImpl
 
@@ -18,9 +19,9 @@ app.secret_key = secrets.token_bytes()
 
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
-repo = VisitsRepositoryImpl()
-user_repo = UsersRepositoryImpl()
-user_counter = UserCounter(repo, user_repo)
+visit_repo = VisitsRepositoryImpl(engine=tables.engine)
+user_repo = UsersRepositoryImpl(engine=tables.engine)
+user_counter = UserCounter(visit_repo, user_repo)
 
 login_manager = LoginManager(app)
 login_manager.init_app(app)
@@ -111,8 +112,12 @@ def signup():
 @app.route('/validate_reg', methods=['GET', 'POST'])
 def validate():
     """Функция, отвечающая за валидацию регистрируемого пользователя."""
-    name = request.form.get('name')
+    name = request.form.get('username')
+    if name is None:
+        return render_template('signup.html', message="Invalid username")
     password = request.form.get('password')
+    if password is None:
+        return render_template('signup.html', message="Invalid password")
     if user_repo.get_user_by_login(name) is not None:
         return render_template('signup.html', message="User already exists")
     user_repo.add_new_user(name, password)
@@ -122,7 +127,7 @@ def validate():
 @app.route('/last')
 def last_user():
     """Функция, отвечающая за отображение страницы, показывающей последнюю запись о входе."""
-    return render_template("last_second.html", line=repo.get_last())
+    return render_template("last_second.html", line=visit_repo.get_last())
 
 
 @app.route("/logout")
@@ -135,19 +140,19 @@ def logout():
 @app.route('/first')
 def first_user():
     """Функция, отвечающая за отображение страницы, показывающей первую запись о входе."""
-    return render_template("last_second.html", line=repo.get_first())
+    return render_template("last_second.html", line=visit_repo.get_first())
 
 
 @app.route('/count')
 def count():
     """Функция, отвечающая за отображение страницы, показывающей количество посещений сайта."""
-    return render_template("for_counter.html", counter=repo.get_users_count())
+    return render_template("for_counter.html", counter=visit_repo.get_users_count())
 
 
 @app.route('/all')
 def all_users():
     """Функция, отвечающая за отображение страницы, показывающей все посещения сайта."""
-    users = [user for user in repo.get_all_records()]
+    users = [user for user in visit_repo.get_all_records()]
 
     return render_template("view.html", table=users)
 
@@ -155,7 +160,7 @@ def all_users():
 @app.route('/profile')
 def profile():
     """Функция, отвечающая за отображение страницы, показывающей все посещения сайта конкретным пользователем."""
-    aaa = list(repo.get_records_by_id(session['id']))
+    aaa = list(visit_repo.get_records_by_id(session['id']))
 
     return render_template("view.html", table=aaa)
 

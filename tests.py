@@ -2,23 +2,46 @@ import unittest
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from werkzeug.security import generate_password_hash
+
+import app as app_file
 
 from app import app
 from database import tables
+from database.user_repository_sqlalchemy import UsersRepositoryImpl
+from database.visit_repository_sqlalchemy import VisitsRepositoryImpl
+from user_counter import UserCounter
 
 
 class UserCounterTest(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.engine = create_engine('sqlite:///test.db', echo=True)
+
+        app_file.visit_repo = VisitsRepositoryImpl(engine=self.engine)
+        app_file.user_repo = UsersRepositoryImpl(engine=self.engine)
+        app_file.user_counter = UserCounter(
+            app_file.visit_repo,
+            app_file.user_repo
+        )
+
         tables.engine = self.engine
         tables.Base.metadata.create_all(self.engine)
         self.session_fabric = sessionmaker(bind=self.engine)
 
         with self.session_fabric() as s:
-            s.add(tables.DatabaseUser(login='111', password_hash='111'))
+            if s.query(tables.DatabaseVisit).count() > 0:
+                s.query(tables.DatabaseVisit).delete()
+            if s.query(tables.DatabaseUser).count() > 0:
+                s.query(tables.DatabaseUser).delete()
+
+        with self.session_fabric() as s:
+            s.add(tables.DatabaseUser(
+                login='111',
+                password_hash=generate_password_hash('111')
+            ))
             s.commit()
 
-    def tearDown(self) -> None:
+    def tearDown(self):
         with self.session_fabric() as s:
             s.query(tables.DatabaseUser).delete()
             s.query(tables.DatabaseVisit).delete()
