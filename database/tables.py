@@ -30,7 +30,7 @@ class DatabaseVisit(Base):
     id = Column(Integer, primary_key=True)
     ip = Column(String)
     page = Column(String)
-    time = Column(String)
+    time = Column(Integer)
     user_agent = Column(String)
     country = Column(String)
     user_id = Column(Integer, nullable=True)

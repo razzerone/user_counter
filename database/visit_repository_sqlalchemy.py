@@ -92,7 +92,28 @@ class VisitsRepositoryImpl(VisitsRepository):
                 user_id=visit.user_id,
             )
 
-    def get_records_by_date(self, time) -> Iterable[domain.visit.Visit]:
+    def get_records_by_date(self, date_begin: str, date_end: str) -> \
+            Iterable[domain.visit.Visit]:
+        begin = int(f'{date_begin.replace("-", "")}000000')
+        end = int(f'{date_end.replace("-", "")}235959')
+        with self.session_factory() as s:
+            visits = (s.query(DatabaseVisit)
+                      .filter(DatabaseVisit.time > begin)
+                      .filter(DatabaseVisit.time < end)
+                      .all())
+            s.commit()
+            for visit in visits:
+                yield domain.visit.Visit(
+                    id=visit.id,
+                    ip=visit.ip,
+                    page=visit.page,
+                    time=visit.time,
+                    user_agent=visit.user_agent,
+                    country=visit.country,
+                    user_id=visit.user_id,
+                )
+
+    def get_records_by_date1(self, time) -> Iterable[domain.visit.Visit]:
         """Реализация получения записей, соответствующих определенному пользователю, из базы данных."""
         session = self.session_factory()
         visits = session.query(DatabaseVisit) \

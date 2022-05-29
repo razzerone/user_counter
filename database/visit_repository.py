@@ -23,5 +23,5 @@ class VisitsRepository:
 
     @staticmethod
     def get_current_timestamp() -> str:
-        """Функция,необходимая для форматирования времени"""
-        return datetime.now().strftime(setting.datetime_format)
+        """Функция, необходимая для форматирования времени"""
+        return datetime.now().strftime(setting.database_datetime_format)

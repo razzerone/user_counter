@@ -1,7 +1,6 @@
 import os
 
 import flask
-import werkzeug
 from flask import request, session, render_template, redirect, url_for, \
     send_from_directory
 from flask_login import login_required, UserMixin, login_user, current_user, \
@@ -140,9 +139,8 @@ def bydate():
 
 @app.route('/recordsbydate', methods=['GET', 'POST'])
 def showbydate():
-    time=datetime.strptime(str(request.form.get('dateOne')),"%Y-%m-%d")\
+    time = datetime.strptime(str(request.form.get('dateOne')), "%Y-%m-%d") \
         .strftime('%d-%m-%Y')
-
 
     table = visit_repo.get_records_by_date(str(time))
     return render_template('view.html', table=table)
@@ -223,15 +221,25 @@ def count():
     )
 
 
-@app.route('/all')
+@app.route('/all', methods=('GET', 'POST'))
 def all_users():
     """
     Функция, отвечающая за отображение страницы, показывающей все посещения
     сайта.
     """
+    if request.method == 'POST':
+        date_begin = flask.request.form['date_begin']
+        date_end = flask.request.form['date_end']
+    else:
+        date_begin = request.args.get('date_begin', '1999-01-01')
+        date_end = request.args.get('date_end', '2030-01-01')
+
+    visits = visit_repo.get_records_by_date(date_begin, date_end)
+
     return render_template(
         "view.html",
-        table=visit_repo.get_all_records()
+        table=visits,
+        form_url=flask.url_for('all_users')
     )
 
 
