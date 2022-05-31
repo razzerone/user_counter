@@ -217,9 +217,11 @@ def all_users():
     if request.method == 'POST':
         date_begin = flask.request.form['date_begin']
         date_end = flask.request.form['date_end']
+        selector=flask.request.form['selector']
     else:
         date_begin = request.args.get('date_begin', '1999-01-01')
         date_end = request.args.get('date_end', '2030-01-01')
+        selector=request.args.get('selector', 'Chrome')
 
     visits = visit_repo.get_records_by_date(date_begin, date_end)
 

@@ -15,6 +15,18 @@
     <label>
         <input type="date" name="date_end" value="2030-01-01">
     </label>
+    <label>
+        Браузер
+        <select name="selector">
+        <option>Chrome</option>
+        <option>Opera</option>
+        <option>FireFox</option>
+        <option>IE</option>
+        <option>Safari</option>
+        <option>Yandex</option>
+    </select>
+
+    </label>
 
     <input type="submit" value="Выбрать"/>
 </form>
@@ -26,6 +38,7 @@
         <th>Page</th>
         <th>Time</th>
         <th>Useragent</th>
+        <th>Browser</th>
         <th>Country</th>
         <th>User-Id</th>
     </tr>
@@ -36,6 +49,7 @@
             <td>{{ row.page }}</td>
             <td class="item"> {{ row.time }}</td>
             <td>{{ row.user_agent }}</td>
+            <td class="ua">{{ row.user_agent }}</td>
             <td>{{ row.country }}</td>
             <td>{{ 'anonymous' if row.user_id is none else row.user_id }}</td>
         </tr>
@@ -53,5 +67,43 @@
     }
 
     </script>
+<script>
+    var items = document.getElementsByClassName("ua"), i, len;
+
+    for (i = 0, len = items.length; i < len; i++)
+    {
+        var value=items[i].innerHTML;
+        if((value.indexOf("Opera")!=-1 || value.indexOf('OPR')) != -1 )
+        {
+            items[i].innerHTML='Opera';
+        }
+        else if(value.indexOf("Edg") != -1 )
+        {
+            items[i].innerHTML='Edge';
+        }
+        else if(value.indexOf("YaBrowser") != -1 )
+        {
+         items[i].innerHTML='YaBrowser';
+        }
+        else if(value.indexOf("Chrome") != -1 )
+        {
+            items[i].innerHTML='Chrome';
+        }
+        else if(value.indexOf("Safari") != -1)
+        {
+            items[i].innerHTML='Safari';
+        }
+        else if(value.indexOf("Firefox") != -1 )
+        {
+         items[i].innerHTML='Firefox';
+        }
+        else
+        {
+            items[i].innerHTML='unknown';
+        }
+    }
+
+
+</script>
 </body>
 </html>
