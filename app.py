@@ -132,19 +132,6 @@ def login():
     return render_template('login.html', message='')
 
 
-@app.route('/bydate')
-def bydate():
-    return render_template('recordsbydate.html')
-
-
-@app.route('/recordsbydate', methods=['GET', 'POST'])
-def showbydate():
-    time = datetime.strptime(str(request.form.get('dateOne')), "%Y-%m-%d") \
-        .strftime('%d-%m-%Y')
-
-    table = visit_repo.get_records_by_date(str(time))
-    return render_template('view.html', table=table)
-
 
 @app.route('/signup')
 def signup():

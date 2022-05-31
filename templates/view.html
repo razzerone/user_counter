@@ -34,12 +34,24 @@
             <td>{{ row.id }}</td>
             <td>{{ row.ip }}</td>
             <td>{{ row.page }}</td>
-            <td>{{ row.time }}</td>
+            <td class="item"> {{ row.time }}</td>
             <td>{{ row.user_agent }}</td>
             <td>{{ row.country }}</td>
             <td>{{ 'anonymous' if row.user_id is none else row.user_id }}</td>
         </tr>
     {% endfor %}
 </table>
+<script>
+    var items = document.getElementsByClassName("item"), i, len;
+
+
+    for (i = 0, len = items.length; i < len; i++) {
+        var value=items[i].innerHTML;
+        var stri=value.toString();
+        var rz=stri.slice(0, 5)+"-"+stri.slice(5,7)+"-"+stri.slice(7,9)+"  "+stri.slice(9,11)+":"+stri.slice(11,13)+":"+stri.slice(13,15);
+        items[i].innerHTML = rz;
+    }
+
+    </script>
 </body>
 </html>
