@@ -6,6 +6,7 @@ from requests import HTTPError
 
 from database.user_repository import UserRepository
 from database.visit_repository import VisitsRepository
+from domain import identifier
 
 
 class UserCounter:
@@ -27,8 +28,15 @@ class UserCounter:
         """
         country = self.get_ip_country(ip)
 
-        return self._visit_repo.add_new_visit(ip, page, user_agent,
-                                              country, user_id)
+        return self._visit_repo.add_new_visit(
+            ip,
+            page,
+            user_agent,
+            identifier.identify_browser(user_agent),
+            identifier.identify_os(user_agent),
+            country,
+            user_id
+        )
 
     @staticmethod
     def get_ip_country(ip: str):
@@ -38,7 +46,9 @@ class UserCounter:
         """
         try:
             response = requests.get(f"https://ipinfo.io/{ip}/json")
-        except (ConnectionError, HTTPError):
+        except (requests.exceptions.ConnectionError,
+                ConnectionError,
+                HTTPError):
             return '*'
 
         content = json.loads(response.content)

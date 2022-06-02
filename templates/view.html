@@ -7,26 +7,36 @@
 </head>
 <body>
 <form name="date" id='form' action="{{ form_url }}" method="post">
-    <label for="date_begin">С </label>
-    <label>
+    <label for="date_begin">
+        С
         <input type="date" name="date_begin" value="1999-01-01">
     </label>
-    <label for="date_end">До </label>
-    <label>
+    <br>
+    <label for="date_end">
+        До
         <input type="date" name="date_end" value="2030-01-01">
     </label>
+    <br>
     <label>
         Браузер
-        <select name="selector">
-        <option>Chrome</option>
-        <option>Opera</option>
-        <option>FireFox</option>
-        <option>IE</option>
-        <option>Safari</option>
-        <option>Yandex</option>
-    </select>
-
+        <input list="browsers" name="browser" id="browser">
+        <datalist id="browsers">
+            {% for br in browsers %}
+                <option value="{{ br }}">
+            {% endfor %}
+        </datalist>
     </label>
+    <br>
+    <label>
+        OS
+        <input list="oses" name="os" id="os">
+        <datalist id="oses">
+            {% for os in oses %}
+                <option value="{{ os }}">
+            {% endfor %}
+        </datalist>
+    </label>
+    <br>
 
     <input type="submit" value="Выбрать"/>
 </form>
@@ -39,6 +49,7 @@
         <th>Time</th>
         <th>Useragent</th>
         <th>Browser</th>
+        <th>OS</th>
         <th>Country</th>
         <th>User-Id</th>
     </tr>
@@ -49,7 +60,8 @@
             <td>{{ row.page }}</td>
             <td class="item"> {{ row.time }}</td>
             <td>{{ row.user_agent }}</td>
-            <td class="ua">{{ row.user_agent }}</td>
+            <td>{{ row.browser }}</td>
+            <td>{{ row.os }}</td>
             <td>{{ row.country }}</td>
             <td>{{ 'anonymous' if row.user_id is none else row.user_id }}</td>
         </tr>
@@ -60,49 +72,11 @@
 
 
     for (i = 0, len = items.length; i < len; i++) {
-        var value=items[i].innerHTML;
-        var stri=value.toString();
-        var rz=stri.slice(0, 5)+"-"+stri.slice(5,7)+"-"+stri.slice(7,9)+"  "+stri.slice(9,11)+":"+stri.slice(11,13)+":"+stri.slice(13,15);
+        var value = items[i].innerHTML;
+        var stri = value.toString();
+        var rz = stri.slice(0, 5) + "-" + stri.slice(5, 7) + "-" + stri.slice(7, 9) + "  " + stri.slice(9, 11) + ":" + stri.slice(11, 13) + ":" + stri.slice(13, 15);
         items[i].innerHTML = rz;
     }
-
-    </script>
-<script>
-    var items = document.getElementsByClassName("ua"), i, len;
-
-    for (i = 0, len = items.length; i < len; i++)
-    {
-        var value=items[i].innerHTML;
-        if((value.indexOf("Opera")!=-1 || value.indexOf('OPR')) != -1 )
-        {
-            items[i].innerHTML='Opera';
-        }
-        else if(value.indexOf("Edg") != -1 )
-        {
-            items[i].innerHTML='Edge';
-        }
-        else if(value.indexOf("YaBrowser") != -1 )
-        {
-         items[i].innerHTML='YaBrowser';
-        }
-        else if(value.indexOf("Chrome") != -1 )
-        {
-            items[i].innerHTML='Chrome';
-        }
-        else if(value.indexOf("Safari") != -1)
-        {
-            items[i].innerHTML='Safari';
-        }
-        else if(value.indexOf("Firefox") != -1 )
-        {
-         items[i].innerHTML='Firefox';
-        }
-        else
-        {
-            items[i].innerHTML='unknown';
-        }
-    }
-
 
 </script>
 </body>

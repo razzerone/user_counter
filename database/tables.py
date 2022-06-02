@@ -32,6 +32,8 @@ class DatabaseVisit(Base):
     page = Column(String)
     time = Column(Integer)
     user_agent = Column(String)
+    browser = Column(String)
+    os = Column(String)
     country = Column(String)
     user_id = Column(Integer, nullable=True)
 

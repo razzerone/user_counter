@@ -17,6 +17,7 @@ import setting
 from database import tables
 from database.user_repository_sqlalchemy import UsersRepositoryImpl
 from database.visit_repository_sqlalchemy import VisitsRepositoryImpl
+from domain import identifier
 from domain.messages import INVALID_PASSWORD, INVALID_USERNAME, \
     USER_ALREADY_EXISTS, USER_NOT_EXIST, USER_REGISTERED, INVALID_CREDENTIALS
 from domain.names import ID, PASSWORD, USERNAME, VISITED
@@ -35,6 +36,22 @@ user_counter = UserCounter(visit_repo, user_repo)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+
+def get_conditions():
+    if request.method == 'POST':
+        return (
+            flask.request.form['date_begin'],
+            flask.request.form['date_end'],
+            flask.request.form['browser'],
+            flask.request.form['os']
+        )
+    return (
+        request.args.get('date_begin', '1999-01-01'),
+        request.args.get('date_end', '2030-01-01'),
+        request.args.get('browser', ''),
+        request.args.get('os', '')
+    )
 
 
 @app.before_request
@@ -132,7 +149,6 @@ def login():
     return render_template('login.html', message='')
 
 
-
 @app.route('/signup')
 def signup():
     """Функция, отвечающая за отображение страницы регистрации пользователя."""
@@ -156,8 +172,6 @@ def validate():
     user_repo.add_new_user(name, password)
 
     return login_func(name, password)
-
-    # return render_template('s.html', message=USER_REGISTERED)
 
 
 @app.route('/last')
@@ -202,9 +216,16 @@ def count():
     Функция, отвечающая за отображение страницы, показывающей количество
     посещений сайта.
     """
+
+    date_begin, date_end, browser, os_ = get_conditions()
+
     return render_template(
         "for_counter.html",
-        counter=visit_repo.get_users_count()
+        browsers=identifier.BROWSERS,
+        oses=identifier.OS,
+        form_url=url_for('count'),
+        counter=visit_repo.get_visit_count_by_condition(date_begin, date_end,
+                                                        browser, os_)
     )
 
 
@@ -214,21 +235,17 @@ def all_users():
     Функция, отвечающая за отображение страницы, показывающей все посещения
     сайта.
     """
-    if request.method == 'POST':
-        date_begin = flask.request.form['date_begin']
-        date_end = flask.request.form['date_end']
-        selector=flask.request.form['selector']
-    else:
-        date_begin = request.args.get('date_begin', '1999-01-01')
-        date_end = request.args.get('date_end', '2030-01-01')
-        selector=request.args.get('selector', 'Chrome')
+    date_begin, date_end, browser, os_ = get_conditions()
 
-    visits = visit_repo.get_records_by_date(date_begin, date_end)
+    visits = visit_repo.get_records_by_condition(None, date_begin, date_end,
+                                                 browser, os_)
 
     return render_template(
         "view.html",
         table=visits,
-        form_url=flask.url_for('all_users')
+        form_url=flask.url_for('all_users'),
+        browsers=identifier.BROWSERS,
+        oses=identifier.OS
     )
 
 
@@ -239,9 +256,18 @@ def profile():
     Функция, отвечающая за отображение страницы, показывающей все посещения
     сайта конкретным пользователем.
     """
+
+    date_begin, date_end, browser, os_ = get_conditions()
+
+    visits = visit_repo.get_records_by_condition(session[ID], date_begin,
+                                                 date_end, browser, os_)
+
     return render_template(
         "view.html",
-        table=visit_repo.get_records_by_id(session[ID])
+        table=visits,
+        form_url=flask.url_for('profile'),
+        browsers=identifier.BROWSERS,
+        oses=identifier.OS
     )
 
 
