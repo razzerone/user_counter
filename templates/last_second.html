@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href='/static/style.css'/>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <table>
+    <title>Статистика</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<table>
         <tr>
             <th>Number</th>
             <th>Address</th>
@@ -24,8 +31,5 @@
             <td>{{ 'anonymous' if line.user_id is none else line.user_id }}</td>
         </tr>
     </table>
-</head>
-<body>
-
 </body>
 </html>

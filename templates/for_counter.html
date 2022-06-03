@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href='/static/counter.css'/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
 </head>
 <body>
-    <form name="date" id='form' action="{{ form_url }}" method="post">
+<form name="date" id='form' action="{{ form_url }}" method="post">
     <label for="date_begin">
         С
         <input type="date" name="date_begin" value="1999-01-01">
@@ -41,7 +45,7 @@
     <input type="submit" value="Выбрать"/>
 </form>
 
-<h1>В указанный промежуток {{counter}} пользователей с указанными параметрами посетили наш сайт</h1>
+<h1>В указанный промежуток {{ counter }} пользователей с указанными параметрами посетили наш сайт</h1>
 
 </body>
 </html>

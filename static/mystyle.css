@@ -1,86 +1,94 @@
 input[type=submit] {
-  background-color: #BFB0A3;
-  width: 100px;
-  height: 80px;
-  border: 20px;
-  border-radius: 20px;
-  box-shadow: 0px 0px 2px 2px #736A62;
-  font:italic small-caps bold 12px/2 cursive;
+    background-color: #BFB0A3;
+    width: 100px;
+    height: 80px;
+    border: 20px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 2px 2px #736A62;
+
 }
-input[type=text]{
+
+input[type=text] {
     border-radius: 10px;
     background-color: #BFB0A3;
     box-shadow: 0px 0px 2px 2px #736A62;
     height: 30px;
-    width:170px;
+    width: 170px;
 }
-input[type=password]{
+
+input[type=password] {
     border-radius: 10px;
     background-color: #BFB0A3;
     box-shadow: 0px 0px 2px 2px #736A62;
     height: 30px;
-    width:170px;
+    width: 170px;
 }
+
 ::placeholder {
-  color: #0D0D0D;
-  font:italic small-caps bold 12px/2 cursive;
+    color: #0D0D0D;
 }
+
 body {
-  font:italic small-caps bold 12px/2 cursive;
-  background-color:#D9C9BA;
-  text-align: center;
+    font-family: 'Manrope', sans-serif;
+    background-color: #D9C9BA;
+    text-align: center;
 }
-li{
-list-style-type: none;
-}
-h1{
-    font:fantasy;
-    left:20px;
-}
-input{
 
-    font:italic small-caps bold 12px/2 cursive;
+li {
+    list-style-type: none;
 }
+
+h1 {
+    left: 20px;
+}
+
+input {
+
+}
+
 table {
-  table-layout: fixed;
-  width: 100%;
-  border-collapse: collapse;
-  border: 8px solid #403D3D;
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    border: 8px solid #403D3D;
 
 }
-tr
-{
+
+tr {
     text-align: center;
     vertical-align: middle;
 
 }
+
 tr:nth-child(even) {
-  background-color: #BFB0A3;
+    background-color: #BFB0A3;
 }
 
-td
-{
-border: 8px solid #403D3D;
-}
-th
-{
+td {
     border: 8px solid #403D3D;
 }
-th:nth-child(even),td:nth-child(even) {
-  background-color: #D9C9BA;
+
+th {
+    border: 8px solid #403D3D;
 }
+
+th:nth-child(even), td:nth-child(even) {
+    background-color: #D9C9BA;
+}
+
 input[type=password]:focus {
     border-radius: 10px;
     background-color: #D9C9BA;
-    box-shadow: 0px 0px 2px 2px rgb(0,0,0);
+    box-shadow: 0px 0px 2px 2px rgb(0, 0, 0);
     height: 30px;
-    width:170px;
+    width: 170px;
 }
-input[type=text]:focus{
-border-radius: 10px;
+
+input[type=text]:focus {
+    border-radius: 10px;
     background-color: #D9C9BA;
-    box-shadow: 0px 0px 2px 2px rgb(0,0,0);
+    box-shadow: 0px 0px 2px 2px rgb(0, 0, 0);
     height: 30px;
-    width:170px;
+    width: 170px;
 }
 

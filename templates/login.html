@@ -1,8 +1,12 @@
-<html>
+<html lang="ru">
 <head>
     <title>Login page</title>
     <link rel="stylesheet" href='/static/mystyle.css'/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+
 </head>
 <body>
 <div class="container">
@@ -17,18 +21,18 @@
         <br>
         <a href="{{ url_for('signup') }}">Sign up</a>
         <p>
-            {{message}}
+            {{ message }}
         </p>
     </form>
     <script>
-function myFunction() {
-  var x = document.getElementById("psw");
-  if (x.type === "password") {
-    x.type = "text";
-  } else {
-    x.type = "password";
-  }
-}
+        function myFunction() {
+            var x = document.getElementById("psw");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
 
 
     </script>

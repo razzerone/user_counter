@@ -1,4 +1,14 @@
-<link rel="stylesheet" href='/static/mystyle.css'/>
+<html lang="ru">
+<head>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+
+    <title>Регистрация</title>
+</head>
+<body>
+
 <form name="signup" action="{{ url_for('validate') }}" method="post">
     <div class="container">
         <h1>Register</h1>
@@ -19,21 +29,19 @@
     </div>
     <div>
         <p>
-            {{message}}
+            {{ message }}
         </p>
     </div>
     <script>
-function myFunction() {
-  var x = document.getElementById("psw");
-  var y =   document.getElementById("psw-repeat");
-  if (x.type === "password") {
-    x.type = "text";
-    y.type = "text";
-  } else {
-    x.type = "password";
-    y.type = "password";
-  }
-}
+        var x = document.getElementById("psw");
+        var y = document.getElementById("psw-repeat");
+        if (x.type === "password") {
+            x.type = "text";
+            y.type = "text";
+        } else {
+            x.type = "password";
+            y.type = "password";
+        }
 
 
 
@@ -42,3 +50,5 @@ function myFunction() {
         <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a>.</p>
     </div>
 </form>
+</body>
+</html>
