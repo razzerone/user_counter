@@ -1,0 +1,41 @@
+<html lang="ru">
+<head>
+    <title>Login page</title>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<div class="container">
+    <h1>Please login</h1>
+    <br>
+
+    <form action="" method="post">
+        <input type="text" placeholder="Username" name="username" id="user">
+        <input type="password" placeholder="Password" name="password" id="psw">
+        <input class="btn btn-default" type="submit" value="Login">
+        <input type="checkbox" onclick="myFunction() " class="checkbox-round">Show Password
+        <br>
+        <a href="{{ url_for('signup') }}">Sign up</a>
+        <p>
+            {{ message }}
+        </p>
+    </form>
+    <script>
+        function myFunction() {
+            var x = document.getElementById("psw");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+
+
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
+    <meta charset="UTF-8">
+    <title>Статистика</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<table>
+        <tr>
+            <th>Number</th>
+            <th>Address</th>
+            <th>Page</th>
+            <th>Time</th>
+            <th>Useragent</th>
+            <th>Country</th>
+            <th>User-Id</th>
+        </tr>
+        <tr>
+            <td>{{ line.id }}</td>
+            <td>{{ line.ip }}</td>
+            <td>{{ line.page }}</td>
+            <td>{{ line.time }}</td>
+            <td>{{ line.user_agent }}</td>
+            <td>{{ line.country }}</td>
+            <td>{{ 'anonymous' if line.user_id is none else line.user_id }}</td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
+    <meta charset="utf-8"/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+    <title>Статистика</title>
+
+</head>
+<body>
+<form name="date" id='form' action="{{ form_url }}" method="post">
+    <label for="date_begin">
+        С
+        <input type="date" name="date_begin" value="1999-01-01">
+    </label>
+    <br>
+    <label for="date_end">
+        До
+        <input type="date" name="date_end" value="2030-01-01">
+    </label>
+    <br>
+    <label>
+        Браузер
+        <input list="browsers" name="browser" id="browser" value="{{ browser }}">
+        <datalist id="browsers">
+            {% for br in browsers %}
+                <option value="{{ br }}">
+            {% endfor %}
+        </datalist>
+    </label>
+    <br>
+    <label>
+        OS
+        <input list="oses" name="os" id="os" value="{{ os }}">
+        <datalist id="oses">
+            {% for os in oses %}
+                <option value="{{ os }}">
+            {% endfor %}
+        </datalist>
+    </label>
+    <br>
+
+    <input type="submit" value="Выбрать"/>
+</form>
+
+<table>
+    <tr>
+        <th>Number</th>
+        <th>Address</th>
+        <th>Page</th>
+        <th>Time</th>
+        <th>Useragent</th>
+        <th>Browser</th>
+        <th>OS</th>
+        <th>Country</th>
+        <th>User-Id</th>
+    </tr>
+    {% for row in table %}
+        <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.ip }}</td>
+            <td>{{ row.page }}</td>
+            <td class="item"> {{ row.time }}</td>
+            <td>{{ row.user_agent }}</td>
+            <td>{{ row.browser }}</td>
+            <td>{{ row.os }}</td>
+            <td>{{ row.country }}</td>
+            <td>{{ 'anonymous' if row.user_id is none else row.user_id }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

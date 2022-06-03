@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href='/static/counter.css'/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+</head>
+<body>
+<form name="date" id='form' action="{{ form_url }}" method="post">
+    <label for="date_begin">
+        С
+        <input type="date" name="date_begin" value="1999-01-01">
+    </label>
+    <br>
+    <label for="date_end">
+        До
+        <input type="date" name="date_end" value="2030-01-01">
+    </label>
+    <br>
+    <label>
+        Браузер
+        <input list="browsers" name="browser" id="browser" value="{{ browser }}">
+        <datalist id="browsers">
+            {% for br in browsers %}
+                <option value="{{ br }}">
+            {% endfor %}
+        </datalist>
+    </label>
+    <br>
+    <label>
+        OS
+        <input list="oses" name="os" id="os" value="{{ os }}">
+        <datalist id="oses">
+            {% for os in oses %}
+                <option value="{{ os }}">
+            {% endfor %}
+        </datalist>
+    </label>
+    <br>
+
+    <input type="submit" value="Выбрать"/>
+</form>
+
+<h1>В указанный промежуток {{ counter }} пользователей с указанными параметрами посетили наш сайт</h1>
+
+</body>
+</html>

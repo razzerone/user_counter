@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+    <title>Меню</title>
+
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1 class="logo">navigation</h1>
+        <strong>
+            <nav>
+                <ul class="menu">
+                    <li><a href="{{ url_for('last_user') }}">last</a></li>
+                    <li><a href="{{ url_for('first_user') }}">first</a></li>
+                    <li><a href="{{ url_for('all_users') }}">all</a></li>
+                    <li><a href="{{ url_for('count') }}">count</a></li>
+                </ul>
+            </nav>
+        </strong>
+    </div>
+</header>
+
+</body>
+</html>

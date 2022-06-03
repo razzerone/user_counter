@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="stylesheet" href='/static/mystyle.css'/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet">
+    <title>Упс...</title>
+
+</head>
+<body>
+<header>
+    <div class="container">
+
+        <h1 class="logo">Login page</h1>
+        <strong>
+            <nav>
+                <ul class="menu">
+                    <li><a href="{{ url_for('auth') }}">Return to main page</a></li>
+                </ul>
+            </nav>
+            <form action="" method="post">
+                <p>you are already logged in, go back to the main page</p>
+            </form>
+        </strong>
+    </div>
+</header>
+
+</body>
+</html>
