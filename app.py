@@ -210,7 +210,7 @@ def first_user():
     return render_template("last_second.html", line=visit_repo.get_first())
 
 
-@app.route('/count')
+@app.route('/count', methods=['GET', 'POST'])
 def count():
     """
     Функция, отвечающая за отображение страницы, показывающей количество
@@ -224,6 +224,8 @@ def count():
         browsers=identifier.BROWSERS,
         oses=identifier.OS,
         form_url=url_for('count'),
+        browser=browser,
+        os=os_,
         counter=visit_repo.get_visit_count_by_condition(date_begin, date_end,
                                                         browser, os_)
     )
@@ -245,11 +247,13 @@ def all_users():
         table=visits,
         form_url=flask.url_for('all_users'),
         browsers=identifier.BROWSERS,
-        oses=identifier.OS
+        oses=identifier.OS,
+        browser=browser,
+        os=os_
     )
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     """
@@ -267,7 +271,9 @@ def profile():
         table=visits,
         form_url=flask.url_for('profile'),
         browsers=identifier.BROWSERS,
-        oses=identifier.OS
+        oses=identifier.OS,
+        browser=browser,
+        os=os_
     )
 
 

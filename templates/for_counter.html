@@ -23,7 +23,7 @@
     <br>
     <label>
         Браузер
-        <input list="browsers" name="browser" id="browser">
+        <input list="browsers" name="browser" id="browser" value="{{ browser }}">
         <datalist id="browsers">
             {% for br in browsers %}
                 <option value="{{ br }}">
@@ -33,7 +33,7 @@
     <br>
     <label>
         OS
-        <input list="oses" name="os" id="os">
+        <input list="oses" name="os" id="os" value="{{ os }}">
         <datalist id="oses">
             {% for os in oses %}
                 <option value="{{ os }}">
